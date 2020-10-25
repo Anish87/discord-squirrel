@@ -1,8 +1,12 @@
 # Discord Bot - Squirrel
-This is a git for Discord bot made using **"Luckshya's Sleepy Discord for Squirrel module"**. 
+This is a git for Discord bot made using **"Luckshya's Sleepy Discord Module for VC:MP(Squirrel)"**.
 
-I'll provide the link for the same, and I'll provide the necessary things in the repo itself, for example, the plugin needed, executables for running the bot etc. 
+I have provided the plugins of 64-bit devices above, the Linux plugin is the one containing `.so` at the end and the Windows plugin is the one containing `.dll` at the end.
 
-Keep in mind that, you will have to edit the script according to your convenience and remember adding the bot token and reading the comments properly.
+## Usage
+Please refer to the wiki for usage details.
 
-> **Bonus** : If you are a VC:MP Server Developer, you just need to dofile the Discord bot script and load the plugin through server.cfg, your work is done.
+The script is easy to use, has many features you can use, and runs on the latest Squirrel module by Luckshya.
+
+Message me on Discord if anything doesn't work or if you're confused about something.
+Discord ID: `Anish#6223`
