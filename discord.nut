@@ -54,10 +54,14 @@ class MyDiscord
 	}
 	
 	function onMessage(message) {
-		local member = message.Member;
-		local serverID = message.ServerID;
-		local authorID = message.Author.ID;
+		local member   = message.Member,
+		      serverID = message.ServerID,
+		      authorID = message.Author.ID,
+		      username = "";
 
+		if(member.Nick != null && member.Nick != "") username = member.Nick;
+		else username = message.Author.Username;
+		
 		if(authorID == null) return;
 		if(authorID == "botUserID") return;
 		if(message.Author.IsBot) return;
@@ -142,10 +146,10 @@ class MyDiscord
 				}
 				else
 				{
-					EchoMessage(role+" "+message.Author.Username+": "+message.Content+"");
-					if(lvl == 1) ::Message("[Discord] [#FFF000]Player "+message.Author.Username+": [#FFFFFF]"+message.Content+"");
+					EchoMessage(role+" "+username+": "+message.Content+"");
+					if(lvl == 1) ::Message("[Discord] [#FFF000]Player "+username+": [#FFFFFF]"+message.Content+"");
 					/* Use an else if condition here as well if you added more 'lvl' values above in script.*/
-					else ::Message("[Discord] [#FFF000]Player "+message.Author.Username+": [#FFFFFF]"+message.Content+"");
+					else ::Message("[Discord] [#FFF000]Player "+username+": [#FFFFFF]"+message.Content+"");
 				}
 			}
 		}
