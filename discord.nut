@@ -54,34 +54,15 @@ class MyDiscord
 	}
 	
 	function onMessage(message) {
-		local member   = message.Member,
-		      serverID = message.ServerID,
-		      authorID = message.Author.ID,
-		      username = "";
-
-		if(member.Nick != null && member.Nick != "") username = member.Nick;
-		else username = message.Author.Username;
+		local member   = message.Member, serverID = message.ServerID, authorID = message.Author.ID;
+		local username = (member.Nick != null && member.Nick != "") ? member.Nick : message.Author.Username;
 		
 		if(authorID == null) return;
-		if(authorID == "botUserID") return;
+		if(authorID == "botID") return;
 		if(message.Author.IsBot) return;
-		if(authorID != "botUserID")
+		if(authorID != "botID")
 		{
-			local role;
-			local lvl;
-			if(message.Member.Roles.find("roleID") != null)
-			{
-				role = "Player";
-				lvl = 1;
-			}
-			/*You can repeat this condition with and 'else if' in case you want more roles. 
-			For Example,
-			else if(message.Member.Roles.find("roleID") != null)
-			{
-				role = "Player/Developer/Staff/VIP"(any string can be used);
-				lvl = 0/1/2/3;(any integer can be used);
-			}
-			I added this for convenience for those who want certain commands to be restricted to specific group of people. Say, staff etc. */
+			local highestRole = HighestRole(member.Roles);
 			if(channels["echo"] == message.ChannelID)
 			{
 				if(message.Content.len() > 0 && message.Content.slice(0,1)=="!")
@@ -89,8 +70,8 @@ class MyDiscord
 					local cmd = GetTok(message.Content, " ", 1).slice(1);
 					local text = GetTok(message.Content, " ", 2, split(message.Content, " ").len());
 					local embed = SqDiscord.Embed.Embed();
-          /*I have added a few commands so that you can continue adding more of them.*/
-					switch(cmd)
+                    /* I have added a few commands so that you can continue adding more of them. */
+                    switch(cmd)
 					{
 						case "cmds":
 						{
@@ -146,10 +127,8 @@ class MyDiscord
 				}
 				else
 				{
-					EchoMessage(role+" "+username+": "+message.Content+"");
-					if(lvl == 1) ::Message("[Discord] [#FFF000]Player "+username+": [#FFFFFF]"+message.Content+"");
-					/* Use an else if condition here as well if you added more 'lvl' values above in script.*/
-					else ::Message("[Discord] [#FFF000]Player "+username+": [#FFFFFF]"+message.Content+"");
+					EchoMessage("**"+username+"**[#ffffff]: "+message.Content+"");
+					::Message(format("%s%s %s:[#FFFFFF]%s", highestRole.GetColor(), highestRole.GetName(), username, message.Content));
 				}
 			}
 		}
@@ -168,10 +147,11 @@ class MyDiscord
 	}
 }
 
-myDiscord <- MyDiscord();
-myDiscord.Connect("your bot token");
+Discord <- MyDiscord();
+Discord.Connect("botToken");
 
-function onDiscordUpdate(connID, eventType, ...) {
+function onDiscordUpdate(connID, eventType, ...) 
+{
 	if(sessions.rawin(connID)) {
 		local session = sessions.rawget(connID);
 		vargv.insert(0, session); //env
@@ -185,4 +165,77 @@ function EchoMessage(message)
 	{
 		sessions.rawget(0).sendMessage(sessions.rawget(0).channels["echo"], message);
 	}
+}
+
+/* Discord Roles */
+DiscordRole <- {};
+class DiscordRoles
+{
+    /* Defs */
+    roleID = null;
+    Name   = null;
+    Color  = null;
+    Level  = null;
+
+    /* Init */
+    constructor(RoleID, name, color, level)
+    {
+        this.roleID = RoleID;
+        this.Name   = name;
+        this.Color  = color;
+        this.Level  = level;
+        ::DiscordRole.rawset(RoleID, this);
+    }
+
+    /* Func */
+    function GetID()
+    {
+        return this.roleID;
+    }
+
+    function GetLevel()
+    {
+        return this.Level;
+    }
+
+    function GetColor()
+    {
+        return "["+this.Color+"]";
+    }
+
+    function GetName()
+    {
+        return this.Name;
+    }
+}
+
+// IDEAS FOR USAGE
+/*
+
+* You can use this class to use different level commands,
+  for eg,
+  'local level = HighestRole(roles).GetLevel();' will return an integer value, which you can use to authorize the commands accordingly.
+
+* You can use it in the Echo from Discord to in-game, as given above in the script.
+
+*/
+
+// USAGE
+/* DiscordRoles("roleID", "roleName", "roleColor(in hex format, for eg, #ffffff)", numericLevel); */
+
+function HighestRole(roles)
+{
+    local highestRole = {
+        "ID"    : "lowest role ID",
+        "Level" : 1
+    };
+    foreach(role in roles)
+    {
+        if(DiscordRole.rawin(role) && DiscordRole[role].GetLevel().tointeger() > highestRole.Level.tointeger())
+        {
+            highestRole.ID    = DiscordRole[role].GetID();
+            highestRole.Level = DiscordRole[role].GetLevel();
+        }
+    }
+    return DiscordRole[highestRole.ID];
 }
