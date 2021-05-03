@@ -54,12 +54,16 @@ class MyDiscord
 	}
 	
 	function onMessage(message) {
-		local member   = message.Member, serverID = message.ServerID, authorID = message.Author.ID;
-		local username = (member.Nick != null && member.Nick != "") ? member.Nick : message.Author.Username;
+		local member   = message.Member, serverID = message.ServerID, authorID = message.Author.ID, content = message.Content;
 		
 		if(authorID == null) return;
-		if(authorID == "botID") return;
+		if(authorID == "728231337865248814") return;
 		if(message.Author.IsBot) return;
+		if(serverID == null) return;
+		
+		local guild = session.GetGuild(serverID);
+		local username = (member.Nick != null && member.Nick != "") ? member.Nick : message.Author.Username;
+		
 		if(authorID != "botID")
 		{
 			local highestRole = HighestRole(member.Roles);
